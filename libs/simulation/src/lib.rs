@@ -1,6 +1,8 @@
 #![feature(crate_visibility_modifier)]
 
-pub use self::{animal::*, brain::*, config::*, eye::*, food::*, role::*, statistics::*, world::*};
+pub use self::{
+    animal::*, brain::*, config::*, eye::*, food::*, role::*, seed::*, statistics::*, world::*,
+};
 
 mod animal;
 mod animal_individual;
@@ -9,6 +11,7 @@ mod config;
 mod eye;
 mod food;
 mod role;
+mod seed;
 mod statistics;
 mod world;
 
@@ -66,7 +69,7 @@ impl Simulation {
 impl Simulation {
     fn process_collisions(&mut self, rng: &mut dyn RngCore) {
         for bird in &mut self.world.birds {
-            for food in &mut self.world.foods {
+            for food in &mut self.world.seeds {
                 let distance = na::distance(&bird.position, &food.position);
 
                 if distance <= self.config.food_size {
@@ -75,21 +78,25 @@ impl Simulation {
                 }
             }
         }
-        // for eagle in &mut self.world.eagles {
-        //     for bird in &mut self.world.birds {
-        //         let distance = na::distance(&eagle.position, &bird.position);
+        for eagle in &mut self.world.eagles {
+            for bird in &mut self.world.birds {
+                let distance = na::distance(&eagle.position, &bird.position);
 
-        //         if distance <= self.config.food_size {
-        //             eagle.satiation += bird.satiation;
-        //             bird.position = rng.gen();
-        //         }
-        //     }
-        // }
+                if distance <= self.config.food_size {
+                    eagle.satiation += bird.satiation;
+                    bird.position = rng.gen();
+                    bird.satiation = 0;
+                }
+            }
+        }
     }
 
     fn process_brains(&mut self) {
         for bird in &mut self.world.birds {
-            bird.process_brain(&self.config, &self.world.foods);
+            bird.process_brain(&self.config, &self.world.seeds);
+        }
+        for eagle in &mut self.world.eagles {
+            eagle.process_brain(&self.config, &self.world.birds);
         }
     }
 
@@ -175,7 +182,7 @@ impl Simulation {
             .map(|i| i.into_animal(&self.config, rng, Role::Predator))
             .collect();
 
-        for food in &mut self.world.foods {
+        for food in &mut self.world.seeds {
             food.position = rng.gen();
         }
 

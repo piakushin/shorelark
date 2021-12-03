@@ -16,12 +16,12 @@ impl Eye {
         &self,
         position: na::Point2<f32>,
         rotation: na::Rotation2<f32>,
-        foods: &[Food],
+        seeds: &[impl Food],
     ) -> Vec<f32> {
         let mut cells = vec![0.0; self.cells];
 
-        for food in foods {
-            let vec = food.position - position;
+        for food in seeds {
+            let vec = food.pos() - position;
             let dist = vec.norm();
 
             if dist > self.fov_range {
@@ -63,18 +63,19 @@ impl Eye {
 
 #[cfg(test)]
 mod tests {
+    use super::Seed;
     use super::*;
 
     const TEST_EYE_CELLS: usize = 13;
 
-    fn food(x: f32, y: f32) -> Food {
-        Food {
+    fn seed(x: f32, y: f32) -> Seed {
+        Seed {
             position: na::Point2::new(x, y),
         }
     }
 
     struct TestCase {
-        foods: Vec<Food>,
+        seeds: Vec<Seed>,
         fov_range: f32,
         fov_angle: f32,
         x: f32,
@@ -90,7 +91,7 @@ mod tests {
             let actual = eye.process_vision(
                 na::Point2::new(self.x, self.y),
                 na::Rotation2::new(self.rot),
-                &self.foods,
+                &self.seeds,
             );
 
             let actual = actual
@@ -129,7 +130,7 @@ mod tests {
         #[test_case(0.1, "             ")]
         fn test(fov_range: f32, expected: &'static str) {
             TestCase {
-                foods: vec![food(1.0, 0.5)],
+                seeds: vec![seed(1.0, 0.5)],
                 fov_angle: FRAC_PI_2,
                 x: 0.5,
                 y: 0.5,
@@ -155,15 +156,15 @@ mod tests {
         #[test_case(2.00 * PI, "+.  .+ +.  .+")]
         fn test(fov_angle: f32, expected: &'static str) {
             TestCase {
-                foods: vec![
-                    food(0.0, 0.0),
-                    food(0.0, 0.33),
-                    food(0.0, 0.66),
-                    food(0.0, 1.0),
-                    food(1.0, 0.0),
-                    food(1.0, 0.33),
-                    food(1.0, 0.66),
-                    food(1.0, 1.0),
+                seeds: vec![
+                    seed(0.0, 0.0),
+                    seed(0.0, 0.33),
+                    seed(0.0, 0.66),
+                    seed(0.0, 1.0),
+                    seed(1.0, 0.0),
+                    seed(1.0, 0.33),
+                    seed(1.0, 0.66),
+                    seed(1.0, 1.0),
                 ],
                 fov_range: 1.0,
                 x: 0.5,
@@ -205,7 +206,7 @@ mod tests {
         #[test_case(0.5, 1.0, "+            ")]
         fn test(x: f32, y: f32, expected: &'static str) {
             TestCase {
-                foods: vec![food(1.0, 0.4), food(1.0, 0.6)],
+                seeds: vec![seed(1.0, 0.4), seed(1.0, 0.6)],
                 fov_range: 1.0,
                 fov_angle: FRAC_PI_2,
                 rot: 0.0,
@@ -234,7 +235,7 @@ mod tests {
         #[test_case(2.50 * PI, "      +      ")]
         fn test(rot: f32, expected: &'static str) {
             TestCase {
-                foods: vec![food(0.5, 1.0)],
+                seeds: vec![seed(0.5, 1.0)],
                 fov_range: 1.0,
                 fov_angle: 2.0 * PI,
                 x: 0.5,

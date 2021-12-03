@@ -73,17 +73,6 @@ terminal.println("  Examples:");
 terminal.println("    train");
 terminal.println("    t 5");
 terminal.println("");
-terminal.println("---- Advanced Tips™ ----");
-terminal.println("");
-terminal.println("- `reset` can modify *all* of the parameters:");
-terminal.println("");
-terminal.println("  * r i:integer_param=123 f:float_param=123");
-terminal.println("  * r a=200 f=200 f:food_size=0.002");
-terminal.println("");
-terminal.println("  This is considered advanced, because you'll have");
-terminal.println("  to look into the source code to find the names.");
-terminal.println("  (https://github.com/Patryk27/shorelark/blob/main/libs/simulation/src/config.rs)");
-terminal.println("");
 terminal.scrollToTop();
 
 /* ---------- */
@@ -206,10 +195,10 @@ function redraw() {
 
     viewport.clear();
 
-    for (const food of world.foods) {
+    for (const seed of world.seeds) {
         viewport.drawCircle(
-            food.x,
-            food.y,
+            seed.x,
+            seed.y,
             (config.food_size / 2.0),
             'rgb(0, 255, 128)',
         );

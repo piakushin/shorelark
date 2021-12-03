@@ -6,11 +6,14 @@ pub struct Food {
     pub y: f32,
 }
 
-impl From<&sim::Food> for Food {
-    fn from(food: &sim::Food) -> Self {
+impl<T> From<&T> for Food
+where
+    T: sim::Food,
+{
+    fn from(food: &T) -> Self {
         Self {
-            x: food.position().x,
-            y: food.position().y,
+            x: food.pos().x,
+            y: food.pos().y,
         }
     }
 }

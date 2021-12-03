@@ -11,7 +11,7 @@ pub struct Statistics {
 impl fmt::Display for Statistics {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "generation {}:", self.generation)?;
-        write!(
+        writeln!(
             f,
             "Birds: min[{:.2}] max[{:.2}] avg[{:.2}] median[{:.2}]",
             self.ga_birds.min_fitness(),

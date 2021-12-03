@@ -3,10 +3,10 @@ use std::cmp::Ordering;
 
 #[derive(Clone, Debug)]
 pub struct Statistics {
-    min_fitness: f32,
-    max_fitness: f32,
-    avg_fitness: f32,
-    median_fitness: f32,
+    pub min_fitness: f32,
+    pub max_fitness: f32,
+    pub avg_fitness: f32,
+    pub median_fitness: f32,
 }
 
 impl Statistics {

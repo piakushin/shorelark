@@ -44,9 +44,9 @@ impl Default for Config {
             sim_speed_max: 0.005,
             sim_speed_accel: 0.2,
             sim_rotation_accel: FRAC_PI_2,
-            sim_generation_length: 2500,
+            sim_generation_length: 1000,
             //
-            world_animals: 40,
+            world_animals: 30,
             world_foods: 60,
         }
     }

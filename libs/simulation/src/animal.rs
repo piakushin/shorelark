@@ -48,7 +48,7 @@ impl Animal {
         self.brain.as_chromosome()
     }
 
-    crate fn process_brain(&mut self, config: &Config, foods: &[Food]) {
+    crate fn process_brain(&mut self, config: &Config, foods: &[impl Food]) {
         self.vision = self.eye.process_vision(self.position, self.rotation, foods);
 
         let (speed, rotation) = self.brain.propagate(self.vision.clone());

@@ -4,7 +4,7 @@ use crate::*;
 pub struct World {
     crate eagles: Vec<Animal>,
     crate birds: Vec<Animal>,
-    crate foods: Vec<Food>,
+    crate seeds: Vec<Seed>,
 }
 
 impl World {
@@ -16,8 +16,8 @@ impl World {
         &self.birds
     }
 
-    pub fn foods(&self) -> &[Food] {
-        &self.foods
+    pub fn seeds(&self) -> &[Seed] {
+        &self.seeds
     }
 }
 
@@ -27,16 +27,16 @@ impl World {
             .map(|_| Animal::random(config, rng, Role::Prey))
             .collect();
 
-        let eagles = (0..10)
+        let eagles = (0..config.world_animals / 10)
             .map(|_| Animal::random(config, rng, Role::Predator))
             .collect();
 
-        let foods = (0..config.world_foods).map(|_| Food::random(rng)).collect();
+        let seeds = (0..config.world_foods).map(|_| Seed::random(rng)).collect();
 
         Self {
             eagles,
             birds,
-            foods,
+            seeds,
         }
     }
 }
