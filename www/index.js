@@ -84,21 +84,6 @@ terminal.println("  This is considered advanced, because you'll have");
 terminal.println("  to look into the source code to find the names.");
 terminal.println("  (https://github.com/Patryk27/shorelark/blob/main/libs/simulation/src/config.rs)");
 terminal.println("");
-terminal.println("---- Funky scenarios ----");
-terminal.println("");
-terminal.println("  * r i:ga_reverse=1 f:sim_speed_min=0.003");
-terminal.println("    (birdies *avoid* food)");
-terminal.println("");
-terminal.println("  * r i:brain_neurons=1");
-terminal.println("    (single-neuroned zombies)");
-terminal.println("");
-terminal.println("  * r f:food_size=0.05");
-terminal.println("    (biiiigie birdies)");
-terminal.println("");
-terminal.println("  * r f:eye_fov_angle=0.45");
-terminal.println("    (narrow field of view)");
-terminal.println("");
-terminal.println("----");
 terminal.scrollToTop();
 
 /* ---------- */

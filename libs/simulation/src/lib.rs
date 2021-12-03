@@ -147,12 +147,13 @@ impl Simulation {
 
         self.world.animals = individuals_preys
             .into_iter()
-            .map(|i| i.into_animal(&self.config, rng, Role::Prey))
-            .collect();
-
-        self.world.animals = individuals_predators
-            .into_iter()
-            .map(|i| i.into_animal(&self.config, rng, Role::Predator))
+            .map(|a| (a, Role::Prey))
+            .chain(
+                individuals_predators
+                    .into_iter()
+                    .map(|a| (a, Role::Predator)),
+            )
+            .map(|(i, role)| i.into_animal(&self.config, rng, role))
             .collect();
 
         for food in &mut self.world.foods {
