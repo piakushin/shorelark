@@ -97,6 +97,9 @@ impl Simulation {
         for bird in &mut self.world.birds {
             bird.process_movement();
         }
+        for eagle in &mut self.world.eagles {
+            eagle.process_movement();
+        }
     }
 
     fn try_evolving(&mut self, rng: &mut dyn RngCore) -> Option<Statistics> {
