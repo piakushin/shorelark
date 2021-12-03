@@ -9,6 +9,7 @@ pub struct Animal {
     crate eye: Eye,
     crate brain: Brain,
     crate satiation: usize,
+    crate role: Role,
 }
 
 impl Animal {
@@ -26,20 +27,21 @@ impl Animal {
 }
 
 impl Animal {
-    crate fn random(config: &Config, rng: &mut dyn RngCore) -> Self {
+    crate fn random(config: &Config, rng: &mut dyn RngCore, role: Role) -> Self {
         let brain = Brain::random(config, rng);
 
-        Self::new(config, rng, brain)
+        Self::new(config, rng, brain, role)
     }
 
     crate fn from_chromosome(
         config: &Config,
         rng: &mut dyn RngCore,
         chromosome: ga::Chromosome,
+        role: Role,
     ) -> Self {
         let brain = Brain::from_chromosome(config, chromosome);
 
-        Self::new(config, rng, brain)
+        Self::new(config, rng, brain, role)
     }
 
     crate fn as_chromosome(&self) -> ga::Chromosome {
@@ -60,10 +62,18 @@ impl Animal {
         self.position.x = na::wrap(self.position.x, 0.0, 1.0);
         self.position.y = na::wrap(self.position.y, 0.0, 1.0);
     }
+
+    crate fn is_prey(&self) -> bool {
+        matches!(self.role, Role::Prey)
+    }
+
+    crate fn is_predator(&self) -> bool {
+        matches!(self.role, Role::Predator)
+    }
 }
 
 impl Animal {
-    fn new(config: &Config, rng: &mut dyn RngCore, brain: Brain) -> Self {
+    fn new(config: &Config, rng: &mut dyn RngCore, brain: Brain, role: Role) -> Self {
         Self {
             position: rng.gen(),
             rotation: rng.gen(),
@@ -72,6 +82,7 @@ impl Animal {
             eye: Eye::new(config),
             brain,
             satiation: 0,
+            role,
         }
     }
 }

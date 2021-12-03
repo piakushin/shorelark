@@ -13,8 +13,8 @@ impl AnimalIndividual {
         }
     }
 
-    pub fn into_animal(self, config: &Config, rng: &mut dyn RngCore) -> Animal {
-        Animal::from_chromosome(config, rng, self.chromosome)
+    pub fn into_animal(self, config: &Config, rng: &mut dyn RngCore, role: Role) -> Animal {
+        Animal::from_chromosome(config, rng, self.chromosome, role)
     }
 }
 

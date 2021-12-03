@@ -230,7 +230,7 @@ function redraw() {
         );
     }
 
-    for (const animal of world.animals) {
+    for (const animal of world.birds) {
         viewport.drawTriangle(
             animal.x,
             animal.y,
@@ -256,15 +256,33 @@ function redraw() {
             );
         }
     }
-    // Draw predators
-    viewport.drawTriangle(
-        0.5,
-        0.5,
-        (config.food_size * 2),
-        0,
-        'rgb(0, 255, 255)',
-    );
-    console.log("predator printed");
+
+    for (const animal of world.predators) {
+        viewport.drawTriangle(
+            animal.x,
+            animal.y,
+            config.food_size * 2,
+            animal.rotation,
+            'rgb(0, 255, 255)',
+        );
+
+        const anglePerCell = config.eye_fov_angle / config.eye_cells;
+
+        for (let cellId = 0; cellId < config.eye_cells; cellId += 1) {
+            const angleFrom = (animal.rotation - config.eye_fov_angle / 2.0) + (cellId * anglePerCell);
+            const angleTo = angleFrom + anglePerCell;
+            const energy = animal.vision[cellId];
+
+            viewport.drawArc(
+                animal.x,
+                animal.y,
+                (config.food_size * 2.5),
+                angleFrom,
+                angleTo,
+                `rgba(0, 255, 128, ${energy})`,
+            );
+        }
+    }
 
     requestAnimationFrame(redraw);
 }

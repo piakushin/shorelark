@@ -14,13 +14,23 @@ impl World {
     pub fn foods(&self) -> &[Food] {
         &self.foods
     }
+
+    pub fn birds(&self) -> impl Iterator<Item = &Animal> + '_ {
+        self.animals.iter().filter(|a| a.is_prey())
+    }
+
+    pub fn predators(&self) -> impl Iterator<Item = &Animal> + '_ {
+        self.animals.iter().filter(|a| a.is_predator())
+    }
 }
 
 impl World {
     crate fn random(config: &Config, rng: &mut dyn RngCore) -> Self {
-        let animals = (0..config.world_animals)
-            .map(|_| Animal::random(config, rng))
+        let mut animals: Vec<Animal> = (0..config.world_animals)
+            .map(|_| Animal::random(config, rng, Role::Prey))
             .collect();
+
+        animals.extend((0..10).map(|_| Animal::random(config, rng, Role::Predator)));
 
         let foods = (0..config.world_foods).map(|_| Food::random(rng)).collect();
 

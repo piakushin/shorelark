@@ -1,6 +1,6 @@
 #![feature(crate_visibility_modifier)]
 
-pub use self::{animal::*, brain::*, config::*, eye::*, food::*, statistics::*, world::*};
+pub use self::{animal::*, brain::*, config::*, eye::*, food::*, role::*, statistics::*, world::*};
 
 mod animal;
 mod animal_individual;
@@ -8,6 +8,7 @@ mod brain;
 mod config;
 mod eye;
 mod food;
+mod role;
 mod statistics;
 mod world;
 
@@ -102,10 +103,19 @@ impl Simulation {
         self.age = 0;
         self.generation += 1;
 
-        let mut individuals: Vec<_> = self
+        let mut individuals_preys: Vec<_> = self
             .world
             .animals
             .iter()
+            .filter(|a| a.is_prey())
+            .map(AnimalIndividual::from_animal)
+            .collect();
+
+        let mut individuals_predators: Vec<_> = self
+            .world
+            .animals
+            .iter()
+            .filter(|a| a.is_predator())
             .map(AnimalIndividual::from_animal)
             .collect();
 
@@ -118,7 +128,10 @@ impl Simulation {
                 .max()
                 .unwrap_or_default();
 
-            for individual in &mut individuals {
+            for individual in &mut individuals_preys {
+                individual.fitness = (max_satiation as f32) - individual.fitness;
+            }
+            for individual in &mut individuals_predators {
                 individual.fitness = (max_satiation as f32) - individual.fitness;
             }
         }
@@ -129,11 +142,17 @@ impl Simulation {
             ga::GaussianMutation::new(self.config.ga_mut_chance, self.config.ga_mut_coeff),
         );
 
-        let (individuals, statistics) = ga.evolve(rng, &individuals);
+        let (individuals_preys, statistics_preys) = ga.evolve(rng, &individuals_preys);
+        let (individuals_predators, statistics_predators) = ga.evolve(rng, &individuals_predators);
 
-        self.world.animals = individuals
+        self.world.animals = individuals_preys
             .into_iter()
-            .map(|i| i.into_animal(&self.config, rng))
+            .map(|i| i.into_animal(&self.config, rng, Role::Prey))
+            .collect();
+
+        self.world.animals = individuals_predators
+            .into_iter()
+            .map(|i| i.into_animal(&self.config, rng, Role::Predator))
             .collect();
 
         for food in &mut self.world.foods {
@@ -142,7 +161,7 @@ impl Simulation {
 
         Statistics {
             generation: self.generation - 1,
-            ga: statistics,
+            ga: statistics_preys,
         }
     }
 }
