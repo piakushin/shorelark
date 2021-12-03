@@ -256,6 +256,15 @@ function redraw() {
             );
         }
     }
+    // Draw predators
+    viewport.drawTriangle(
+        0.5,
+        0.5,
+        (config.food_size * 2),
+        0,
+        'rgb(0, 255, 255)',
+    );
+    console.log("predator printed");
 
     requestAnimationFrame(redraw);
 }
