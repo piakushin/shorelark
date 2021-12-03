@@ -242,7 +242,7 @@ function redraw() {
         }
     }
 
-    for (const animal of world.predators) {
+    for (const animal of world.eagles) {
         viewport.drawTriangle(
             animal.x,
             animal.y,

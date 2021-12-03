@@ -65,27 +65,37 @@ impl Simulation {
 
 impl Simulation {
     fn process_collisions(&mut self, rng: &mut dyn RngCore) {
-        for animal in &mut self.world.animals {
+        for bird in &mut self.world.birds {
             for food in &mut self.world.foods {
-                let distance = na::distance(&animal.position, &food.position);
+                let distance = na::distance(&bird.position, &food.position);
 
                 if distance <= self.config.food_size {
-                    animal.satiation += 1;
+                    bird.satiation += 1;
                     food.position = rng.gen();
                 }
             }
         }
+        // for eagle in &mut self.world.eagles {
+        //     for bird in &mut self.world.birds {
+        //         let distance = na::distance(&eagle.position, &bird.position);
+
+        //         if distance <= self.config.food_size {
+        //             eagle.satiation += bird.satiation;
+        //             bird.position = rng.gen();
+        //         }
+        //     }
+        // }
     }
 
     fn process_brains(&mut self) {
-        for animal in &mut self.world.animals {
-            animal.process_brain(&self.config, &self.world.foods);
+        for bird in &mut self.world.birds {
+            bird.process_brain(&self.config, &self.world.foods);
         }
     }
 
     fn process_movements(&mut self) {
-        for animal in &mut self.world.animals {
-            animal.process_movement();
+        for bird in &mut self.world.birds {
+            bird.process_movement();
         }
     }
 
@@ -103,36 +113,43 @@ impl Simulation {
         self.age = 0;
         self.generation += 1;
 
-        let mut individuals_preys: Vec<_> = self
+        let mut individuals_birds: Vec<_> = self
             .world
-            .animals
+            .birds
             .iter()
-            .filter(|a| a.is_prey())
             .map(AnimalIndividual::from_animal)
             .collect();
 
-        let mut individuals_predators: Vec<_> = self
+        let mut individuals_eagles: Vec<_> = self
             .world
-            .animals
+            .eagles
             .iter()
-            .filter(|a| a.is_predator())
             .map(AnimalIndividual::from_animal)
             .collect();
 
         if self.config.ga_reverse == 1 {
-            let max_satiation = self
+            let max_satiation_birds = self
                 .world
-                .animals
+                .birds
                 .iter()
-                .map(|animal| animal.satiation)
+                .map(|bird| bird.satiation)
                 .max()
                 .unwrap_or_default();
 
-            for individual in &mut individuals_preys {
-                individual.fitness = (max_satiation as f32) - individual.fitness;
+            for individual in &mut individuals_birds {
+                individual.fitness = (max_satiation_birds as f32) - individual.fitness;
             }
-            for individual in &mut individuals_predators {
-                individual.fitness = (max_satiation as f32) - individual.fitness;
+
+            let max_satiation_eagles = self
+                .world
+                .eagles
+                .iter()
+                .map(|eagle| eagle.satiation)
+                .max()
+                .unwrap_or_default();
+
+            for individual in &mut individuals_eagles {
+                individual.fitness = (max_satiation_eagles as f32) - individual.fitness;
             }
         }
 
@@ -142,18 +159,17 @@ impl Simulation {
             ga::GaussianMutation::new(self.config.ga_mut_chance, self.config.ga_mut_coeff),
         );
 
-        let (individuals_preys, statistics_preys) = ga.evolve(rng, &individuals_preys);
-        let (individuals_predators, statistics_predators) = ga.evolve(rng, &individuals_predators);
+        let (individuals_birds, statistics_birds) = ga.evolve(rng, &individuals_birds);
+        let (individuals_eagles, statistics_eagles) = ga.evolve(rng, &individuals_eagles);
 
-        self.world.animals = individuals_preys
+        self.world.birds = individuals_birds
             .into_iter()
-            .map(|a| (a, Role::Prey))
-            .chain(
-                individuals_predators
-                    .into_iter()
-                    .map(|a| (a, Role::Predator)),
-            )
-            .map(|(i, role)| i.into_animal(&self.config, rng, role))
+            .map(|i| i.into_animal(&self.config, rng, Role::Prey))
+            .collect();
+
+        self.world.eagles = individuals_eagles
+            .into_iter()
+            .map(|i| i.into_animal(&self.config, rng, Role::Predator))
             .collect();
 
         for food in &mut self.world.foods {
@@ -162,7 +178,8 @@ impl Simulation {
 
         Statistics {
             generation: self.generation - 1,
-            ga: statistics_preys,
+            ga_birds: statistics_birds,
+            ga_eagles: statistics_eagles,
         }
     }
 }
@@ -180,7 +197,7 @@ mod tests {
         let mut sim = Simulation::random(Default::default(), &mut rng);
 
         let avg_fitness = (0..10)
-            .map(|_| sim.train(&mut rng).ga.avg_fitness())
+            .map(|_| sim.train(&mut rng).ga_birds.avg_fitness())
             .sum::<f32>()
             / 10.0;
 

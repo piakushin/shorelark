@@ -62,14 +62,6 @@ impl Animal {
         self.position.x = na::wrap(self.position.x, 0.0, 1.0);
         self.position.y = na::wrap(self.position.y, 0.0, 1.0);
     }
-
-    crate fn is_prey(&self) -> bool {
-        matches!(self.role, Role::Prey)
-    }
-
-    crate fn is_predator(&self) -> bool {
-        matches!(self.role, Role::Predator)
-    }
 }
 
 impl Animal {
